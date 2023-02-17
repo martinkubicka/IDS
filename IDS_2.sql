@@ -14,7 +14,7 @@ CREATE TABLE Lek (
     lek_na_predpis  NUMBER(1) NOT NULL
 );
 
-CREATE TABLE Poistovna (
+CREATE TABLE Pojistovna (
     pojistovna_pk NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     pojistovna_nazev VARCHAR2(50) NOT NULL,
     pojistovna_sidlo VARCHAR2(50) NOT NULL
@@ -41,12 +41,12 @@ CREATE TABLE Hradi (
         REFERENCES Lek (lek_pk),
     CONSTRAINT hradi_pk_pojistovna
         FOREIGN KEY (pojistovna_pk)
-        REFERENCES Poistovna (pojistovna_pk)
+        REFERENCES Pojistovna (pojistovna_pk)
 );
 
 --------- Ukazkove data ---------
 INSERT INTO Lek (lek_nazev, lek_cena, lek_na_predpis) VALUES ('Paralen', 29.90, 0);
-INSERT INTO Poistovna (pojistovna_nazev, pojistovna_sidlo) VALUES ('VZP', 'Praha 2');
+INSERT INTO Pojistovna (pojistovna_nazev, pojistovna_sidlo) VALUES ('VZP', 'Praha 2');
 INSERT INTO Skladuje (lekarna_pk, lek_pk, skladuje_mnozstvi) VALUES (1, 1, 50);
 INSERT INTO Hradi (lek_pk, pojistovna_pk) VALUES (1, 1);
 
