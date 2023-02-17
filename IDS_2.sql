@@ -24,7 +24,7 @@ CREATE TABLE Pojistovna (
 CREATE TABLE Skladuje (
     lekarna_pk NUMBER NOT NULL,
     lek_pk NUMBER NOT NULL,
-    skladuje_mnozstvi NUMBER(10) NOT NULL,
+    mnozstvi NUMBER(10) NOT NULL,
     CONSTRAINT skladuje_pk_lekarna
         FOREIGN KEY (lekarna_pk)
         REFERENCES Lekarna (lekarna_pk),
@@ -36,6 +36,7 @@ CREATE TABLE Skladuje (
 CREATE TABLE Hradi (
     lek_pk NUMBER NOT NULL,
     pojistovna_pk NUMBER NOT NULL,
+    castka NUMBER(10) NOT NULL,
     CONSTRAINT hradi_pk_lek
         FOREIGN KEY (lek_pk)
         REFERENCES Lek (lek_pk),
@@ -47,6 +48,6 @@ CREATE TABLE Hradi (
 --------- Ukazkove data ---------
 INSERT INTO Lek (lek_nazev, lek_cena, lek_na_predpis) VALUES ('Paralen', 29.90, 0);
 INSERT INTO Pojistovna (pojistovna_nazev, pojistovna_sidlo) VALUES ('VZP', 'Praha 2');
-INSERT INTO Skladuje (lekarna_pk, lek_pk, skladuje_mnozstvi) VALUES (1, 1, 50);
-INSERT INTO Hradi (lek_pk, pojistovna_pk) VALUES (1, 1);
+INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES (1, 1, 50);
+INSERT INTO Hradi (lek_pk, pojistovna_pk,castka) VALUES (1, 1, 10);
 
