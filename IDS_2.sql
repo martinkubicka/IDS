@@ -83,10 +83,10 @@ CREATE TABLE Skladuje (
     lekarna_pk NUMBER NOT NULL,
     lek_pk NUMBER NOT NULL,
     mnozstvi NUMBER(10) NOT NULL,
-    CONSTRAINT skladuje_pk_lekarna
+    CONSTRAINT skladuje_ck_lekarna
         FOREIGN KEY (lekarna_pk)
         REFERENCES Lekarna (lekarna_pk),
-    CONSTRAINT skladuje_pk_lek
+    CONSTRAINT skladuje_ck_lek
         FOREIGN KEY (lek_pk)
         REFERENCES Lek (lek_pk)    
 );
@@ -95,42 +95,42 @@ CREATE TABLE Hradi (
     lek_pk NUMBER NOT NULL,
     pojistovna_pk NUMBER NOT NULL,
     castka NUMBER(10) NOT NULL,
-    CONSTRAINT hradi_pk_lek
+    CONSTRAINT hradi_ck_lek
         FOREIGN KEY (lek_pk)
         REFERENCES Lek (lek_pk),
-    CONSTRAINT hradi_pk_pojistovna
+    CONSTRAINT hradi_ck_pojistovna
         FOREIGN KEY (pojistovna_pk)
         REFERENCES Pojistovna (pojistovna_pk)
 );
 
 --------- Example data ---------
 INSERT INTO Lek (lek_nazev, lek_cena, lek_na_predpis) VALUES ('Paralen', 29.90, 0);
-INSERT INTO Pojistovna (pojistovna_nazev, pojistovna_sidlo) VALUES ('VZP', 'Praha 2');
-INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES (1, 1, 50);
-INSERT INTO Hradi (lek_pk, pojistovna_pk,castka) VALUES (1, 1, 10);
 INSERT INTO Lek (lek_nazev, lek_cena, lek_na_predpis) VALUES ('Aspirin', 39.90, 0);
+INSERT INTO Lek (lek_nazev, lek_cena, lek_na_predpis) VALUES ('Strepsils', 69.90, 0);
 INSERT INTO Lek (lek_nazev, lek_cena, lek_na_predpis) VALUES ('Ibuprofen', 49.90, 1);
+INSERT INTO Lek (lek_nazev, lek_cena, lek_na_predpis) VALUES ('Xanax', 159.90, 1);
+
+INSERT INTO Pojistovna (pojistovna_nazev, pojistovna_sidlo) VALUES ('VZP', 'Praha 2');
 INSERT INTO Pojistovna (pojistovna_nazev, pojistovna_sidlo) VALUES ('Česká pojišťovna', 'Praha 1');
 INSERT INTO Pojistovna (pojistovna_nazev, pojistovna_sidlo) VALUES ('Uniqa', 'Brno');
-INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES (1, 2, 30);
-INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES (2, 3, 20);
-INSERT INTO Hradi (lek_pk, pojistovna_pk,castka) VALUES (2, 2, 20);
-INSERT INTO Hradi (lek_pk, pojistovna_pk,castka) VALUES (3, 1, 15);
-INSERT INTO Lek (lek_nazev, lek_cena, lek_na_predpis) VALUES ('Strepsils', 69.90, 0);
-INSERT INTO Lek (lek_nazev, lek_cena, lek_na_predpis) VALUES ('Xanax', 159.90, 1);
 INSERT INTO Pojistovna (pojistovna_nazev, pojistovna_sidlo) VALUES ('Zdravotní pojišťovna ministerstva vnitra', 'Praha 3');
 INSERT INTO Pojistovna (pojistovna_nazev, pojistovna_sidlo) VALUES ('Maxima pojišťovna', 'Bratislava');
+
+INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES (1, 1, 50);
+INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES (1, 2, 30);
+INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES (2, 3, 20);
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES (2, 1, 100);
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES (3, 2, 10);
+
+INSERT INTO Hradi (lek_pk, pojistovna_pk,castka) VALUES (2, 2, 20);
+INSERT INTO Hradi (lek_pk, pojistovna_pk,castka) VALUES (3, 1, 15);
 INSERT INTO Hradi (lek_pk, pojistovna_pk,castka) VALUES (1, 2, 15);
 INSERT INTO Hradi (lek_pk, pojistovna_pk,castka) VALUES (3, 2, 20);
-
-
-
+INSERT INTO Hradi (lek_pk, pojistovna_pk,castka) VALUES (1, 1, 10);
 
 INSERT INTO Nakup (nakup_datum, nakup_suma) VALUES (TO_DATE('17.02.2023', 'DD.MM.YYYY'), 59.80);
-INSERT INTO Nakup (nakup_datum, nakup_suma) VALUES (TO_DATE('17.02.2023', 'DD.MM.YYYY'), ); -- todo
-INSERT INTO Nakup (nakup_datum, nakup_suma) VALUES (TO_DATE('19.02.2023', 'DD.MM.YYYY'), ); -- todo
+INSERT INTO Nakup (nakup_datum, nakup_suma) VALUES (TO_DATE('17.02.2023', 'DD.MM.YYYY'), 159.60); 
+INSERT INTO Nakup (nakup_datum, nakup_suma) VALUES (TO_DATE('19.02.2023', 'DD.MM.YYYY'), 369.6);
 
 INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES (2, "020220/1234");
 INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES (3, "9815121111");
@@ -144,7 +144,9 @@ INSERT INTO Byl_proveden (nakup_pk, lekarna_pk) VALUES (3, 2);
 
 INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES (1, 1, 2);
 INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES (2, 1, 1);
-INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES (2, 2, 1);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES (2, 2, 2);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES (2, 4, 1);
 INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES (3, 3, 3);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES (3, 5, 1);
 
 --------- End of IDS_2.sql ---------
