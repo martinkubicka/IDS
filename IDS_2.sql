@@ -49,7 +49,7 @@ CREATE TABLE Lek (
     lek_pk NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     lek_nazev VARCHAR2(50) NOT NULL,
     lek_cena NUMBER(10) NOT NULL,
-    lek_na_predpis  NUMBER(1) NOT NULL
+    lek_na_predpis  NUMBER(1) NOT NULL CHECK(REGEXP_LIKE(lek_na_predpis, '^(0|1)$'))
 );
 
 CREATE TABLE Pojistovna (
