@@ -39,7 +39,10 @@ CREATE TABLE Lekarna (
     lekarna_pk NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     lekarna_nazev VARCHAR2(50) NOT NULL,
     lekarna_jmeno_majitele VARCHAR2(50) NOT NULL,
-    lekarna_adresa VARCHAR2(100) NOT NULL
+    lekarna_ulice VARCHAR2(50) NOT NULL,
+    lekarna_psc NUMBER(10) NOT NULL,
+    lekarna_mesto VARCHAR2(50) NOT NULL,
+    lekarna_stat VARCHAR2(50) NOT NULL,
 );
 
 CREATE TABLE Lek (
@@ -123,8 +126,8 @@ INSERT INTO Nakup (nakup_datum, nakup_suma) VALUES (TO_DATE('19.02.2023', 'DD.MM
 INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum="17.02.2023" and nakup_suma=159.60), "020220/1234");
 INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum="19.02.2023" and nakup_suma=369.60), "9815121111");
 
-INSERT INTO Lekarna (lekarna_nazev, lekarna_jmeno_majitele, lekarna_adresa) VALUES ("Vaše lékárna", "Matěj Macek", "Kolejní 2, 61200, Brno, Česká republika");
-INSERT INTO Lekarna (lekarna_nazev, lekarna_jmeno_majitele, lekarna_adresa) VALUES ("Nejlepší lékárna", "Martin Kubička", "Božetěchova 2, 61200, Brno, Česká republika");
+INSERT INTO Lekarna (lekarna_nazev, lekarna_jmeno_majitele, lekarna_ulice, lekarna_psc, lekarna_mesto, lekarna_stat) VALUES ("Vaše lékárna", "Matěj Macek", "Kolejní 2", 61200, "Brno", "Česká republika");
+INSERT INTO Lekarna (lekarna_nazev, lekarna_jmeno_majitele, lekarna_ulice, lekarna_psc, lekarna_mesto, lekarna_stat) VALUES ("Nejlepší lékárna", "Martin Kubička", "Božetěchova 2", 61200, "Brno", "Česká republika");
 
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev="Vaše lékárna"), (SELECT lek_pk from Lek WHERE lek_nazev="Paralen"), 50);
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev="Vaše lékárna"), (SELECT lek_pk from Lek WHERE lek_nazev="Aspirin"), 30);
