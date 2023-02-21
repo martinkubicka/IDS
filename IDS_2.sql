@@ -21,7 +21,11 @@ DROP TABLE Obsahuje;
 CREATE TABLE Nakup (
     nakup_pk NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nakup_datum DATE NOT NULL,
-    nakup_suma NUMBER(10) NOT NULL
+    nakup_suma NUMBER(10) NOT NULL,
+    lekarna_pk NUMBER NOT NULL, -- relationship 0..* to 1
+    CONSTRAINT byl_proveden_ck_lekarna
+        FOREIGN KEY (lekarna_pk)
+        REFERENCES Lekarna (lekarna_pk)
 );
 
 -- Implementation of generalization relation of Nakup entity
@@ -71,17 +75,6 @@ CREATE TABLE Obsahuje (
         REFERENCES Nakup (nakup_pk)
 );
 
-CREATE TABLE Byl_proveden (
-    nakup_pk NUMBER NOT NULL,
-    lekarna_pk NUMBER NOT NULL,
-    CONSTRAINT byl_proveden_ck_nakup
-        FOREIGN KEY (nakup_pk)
-        REFERENCES Nakup (nakup_pk),
-    CONSTRAINT byl_proveden_ck_lekarna
-        FOREIGN KEY (lekarna_pk)
-        REFERENCES Lekarna (lekarna_pk)
-);
-
 CREATE TABLE Skladuje (
     lekarna_pk NUMBER NOT NULL,
     lek_pk NUMBER NOT NULL,
@@ -119,15 +112,15 @@ INSERT INTO Pojistovna (pojistovna_nazev, pojistovna_sidlo) VALUES ('Uniqa', 'Br
 INSERT INTO Pojistovna (pojistovna_nazev, pojistovna_sidlo) VALUES ('Zdravotní pojišťovna ministerstva vnitra', 'Praha 3');
 INSERT INTO Pojistovna (pojistovna_nazev, pojistovna_sidlo) VALUES ('Maxima pojišťovna', 'Bratislava');
 
-INSERT INTO Nakup (nakup_datum, nakup_suma) VALUES (TO_DATE('17.02.2023', 'DD.MM.YYYY'), 59.80);
-INSERT INTO Nakup (nakup_datum, nakup_suma) VALUES (TO_DATE('17.02.2023', 'DD.MM.YYYY'), 159.60); 
-INSERT INTO Nakup (nakup_datum, nakup_suma) VALUES (TO_DATE('19.02.2023', 'DD.MM.YYYY'), 369.6);
+INSERT INTO Lekarna (lekarna_nazev, lekarna_jmeno_majitele, lekarna_ulice, lekarna_psc, lekarna_mesto, lekarna_stat) VALUES ("Vaše lékárna", "Matěj Macek", "Kolejní 2", 61200, "Brno", "Česká republika");
+INSERT INTO Lekarna (lekarna_nazev, lekarna_jmeno_majitele, lekarna_ulice, lekarna_psc, lekarna_mesto, lekarna_stat) VALUES ("Nejlepší lékárna", "Martin Kubička", "Božetěchova 2", 61200, "Brno", "Česká republika");
+
+INSERT INTO Nakup (nakup_datum, nakup_suma, lekarna_pk) VALUES (TO_DATE('17.02.2023', 'DD.MM.YYYY'), 59.80, (SELECT lekarna_pk from Lekarna WHERE lekarna_nazev="Vaše lékárna"));
+INSERT INTO Nakup (nakup_datum, nakup_suma, lekarna_pk) VALUES (TO_DATE('17.02.2023', 'DD.MM.YYYY'), 159.60, (SELECT lekarna_pk from Lekarna WHERE lekarna_nazev="Nejlepší lékárna")); 
+INSERT INTO Nakup (nakup_datum, nakup_suma, lekarna_pk) VALUES (TO_DATE('19.02.2023', 'DD.MM.YYYY'), 369.6, (SELECT lekarna_pk from Lekarna WHERE lekarna_nazev="Nejlepší lékárna"));
 
 INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum="17.02.2023" and nakup_suma=159.60), "020220/1234");
 INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum="19.02.2023" and nakup_suma=369.60), "9815121111");
-
-INSERT INTO Lekarna (lekarna_nazev, lekarna_jmeno_majitele, lekarna_ulice, lekarna_psc, lekarna_mesto, lekarna_stat) VALUES ("Vaše lékárna", "Matěj Macek", "Kolejní 2", 61200, "Brno", "Česká republika");
-INSERT INTO Lekarna (lekarna_nazev, lekarna_jmeno_majitele, lekarna_ulice, lekarna_psc, lekarna_mesto, lekarna_stat) VALUES ("Nejlepší lékárna", "Martin Kubička", "Božetěchova 2", 61200, "Brno", "Česká republika");
 
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev="Vaše lékárna"), (SELECT lek_pk from Lek WHERE lek_nazev="Paralen"), 50);
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev="Vaše lékárna"), (SELECT lek_pk from Lek WHERE lek_nazev="Aspirin"), 30);
@@ -140,10 +133,6 @@ INSERT INTO Hradi (pojistovna_pk, lek_pk, castka) VALUES ((SELECT pojistovna_pk 
 INSERT INTO Hradi (pojistovna_pk, lek_pk, castka) VALUES ((SELECT pojistovna_pk from Pojistovna WHERE pojistovna_nazev="Česká pojišťovna"), (SELECT lek_pk from Lek WHERE lek_nazev="Strepsils"), 20);
 INSERT INTO Hradi (pojistovna_pk, lek_pk, castka) VALUES ((SELECT pojistovna_pk from Pojistovna WHERE pojistovna_nazev="VZP"), (SELECT lek_pk from Lek WHERE lek_nazev="Xanax"), 15);
 INSERT INTO Hradi (pojistovna_pk, lek_pk, castka) VALUES ((SELECT pojistovna_pk from Pojistovna WHERE pojistovna_nazev="VZP"), (SELECT lek_pk from Lek WHERE lek_nazev="Paralen"), 10);
-
-INSERT INTO Byl_proveden (nakup_pk, lekarna_pk) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum="17.02.2023" and nakup_suma=58.80), (SELECT lekarna_pk from Lekarna WHERE lekarna_nazev="Vaše lékárna"));
-INSERT INTO Byl_proveden (nakup_pk, lekarna_pk) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum="17.02.2023" and nakup_suma=159.60), (SELECT lekarna_pk from Lekarna WHERE lekarna_nazev="Nejlepší lékárna"));
-INSERT INTO Byl_proveden (nakup_pk, lekarna_pk) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum="19.02.2023" and nakup_suma=369.60), (SELECT lekarna_pk from Lekarna WHERE lekarna_nazev="Nejlepší lékárna"));
 
 INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum="17.02.2023" and nakup_suma=58.80), (SELECT lek_pk from Lek WHERE lek_nazev="Paralen"), 2);
 INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum="17.02.2023" and nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev="Paralen"), 1);
