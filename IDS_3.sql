@@ -142,3 +142,41 @@ INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from 
 INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('19.02.2023', 'DD.MM.YYYY') and nakup_suma=369.60), (SELECT lek_pk from Lek WHERE lek_nazev='Strepsils'), 3);
 
 --------- End of IDS_2.sql ---------
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---------  IDS_3.sql ---------
+
+--SELECT
+-- 2x spojenie dvoch tabuliek - martin
+-- 1x spojenie troch tabuliek - matej           --TO BE TESTED 
+-- 2x s GROUPBY a agregačnou funkciou - matej   --TO BE TESTED
+-- 1x dotaz s EXISTS - martin
+-- 1x IN s vnorenym selektom - martin
+
+----------------------------------------- NOT TESTED YET -----------------------------------------
+
+-- --The resulting output of this SELECT statement will include the order_id, customer_name, and product_name for all orders made between January 1, 2022, and December 31, 2022.
+-- SELECT 
+--     orders.order_id, 
+--     customers.customer_name, 
+--     products.product_name
+-- FROM orders
+--     JOIN customers ON orders.customer_id = customers.customer_id
+--     JOIN products ON orders.product_id = products.product_id
+-- WHERE 
+--     orders.order_date BETWEEN '2022-01-01' AND '2022-12-31'
+
+-- --Calculation of the average number of products per order in the "orders" table
+-- SELECT order_id, 
+--     AVG(quantity)
+-- FROM order_details
+-- GROUP BY order_id;
+
+-- --Calculation of total sales for each year in the "sales" table
+-- SELECT YEAR(order_date) as year, 
+-- SUM(total_price) as total_revenue
+-- FROM sales
+-- GROUP BY YEAR(order_date);
+
+----------------------------------------- NOT TESTED YET -----------------------------------------
