@@ -120,8 +120,8 @@ INSERT INTO Nakup (nakup_datum, nakup_suma, lekarna_pk) VALUES (TO_DATE('17.02.2
 INSERT INTO Nakup (nakup_datum, nakup_suma, lekarna_pk) VALUES (TO_DATE('17.02.2023', 'DD.MM.YYYY'), 159.60, (SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Nejlepší lékárna')); 
 INSERT INTO Nakup (nakup_datum, nakup_suma, lekarna_pk) VALUES (TO_DATE('19.02.2023', 'DD.MM.YYYY'), 369.6, (SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Nejlepší lékárna'));
 
-INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') and nakup_suma=159.60), '020220/1234');
-INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('19.02.2023', 'DD.MM.YYYY') and nakup_suma=369.60), '981512111');
+INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=159.60), '020220/1234');
+INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('19.02.2023', 'DD.MM.YYYY') AND nakup_suma=369.60), '981512111');
 
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Vaše lékárna'), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 50);
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Vaše lékárna'), (SELECT lek_pk from Lek WHERE lek_nazev='Aspirin'), 30);
@@ -135,28 +135,26 @@ INSERT INTO Hradi (pojistovna_pk, lek_pk, castka) VALUES ((SELECT pojistovna_pk 
 INSERT INTO Hradi (pojistovna_pk, lek_pk, castka) VALUES ((SELECT pojistovna_pk from Pojistovna WHERE pojistovna_nazev='VZP'), (SELECT lek_pk from Lek WHERE lek_nazev='Xanax'), 15);
 INSERT INTO Hradi (pojistovna_pk, lek_pk, castka) VALUES ((SELECT pojistovna_pk from Pojistovna WHERE pojistovna_nazev='VZP'), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 10);
 
-INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') and nakup_suma=59.80), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 2);
-INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') and nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 1);
-INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') and nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Aspirin'), 2);
-INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') and nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Ibuprofen'), 1);
-INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('19.02.2023', 'DD.MM.YYYY') and nakup_suma=369.60), (SELECT lek_pk from Lek WHERE lek_nazev='Strepsils'), 3);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=59.80), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 2);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 1);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Aspirin'), 2);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Ibuprofen'), 1);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('19.02.2023', 'DD.MM.YYYY') AND nakup_suma=369.60), (SELECT lek_pk from Lek WHERE lek_nazev='Strepsils'), 3);
 
---------- End of IDS_2.sql ---------
+---------  SELECTS ---------
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
----------  IDS_3.sql ---------
-
---SELECT
--- 2x spojenie dvoch tabuliek - martin
--- 1x spojenie troch tabuliek - matej           --TO BE TESTED 
--- 2x s GROUPBY a agregačnou funkciou - matej   --TO BE TESTED
--- 1x dotaz s EXISTS - martin
--- 1x IN s vnorenym selektom - martin
+-- Find all pharmacies that store Paralen
+SELECT lekarna_nazev, lekarna_ulice, lekarna_mesto, lekarna_psc, lekarna_stat FROM Lekarna NATURAL JOIN Skladuje WHERE lek_pk=(SELECT lek_pk from Lek WHERE lek_nazev='Paralen');      
+-- Find all medicines that are covered by Česká pojišťovna
+SELECT lek_nazev FROM Lek NATURAL JOIN Hradi WHERE pojistovna_pk=(SELECT pojistovna_pk from Pojistovna WHERE pojistovna_nazev='Česká pojišťovna');
+-- Find all medicines that stored by any of pharmacies
+SELECT lek_nazev FROM lek WHERE EXISTS ( SELECT lekarna_pk FROM Skladuje WHERE lek_pk = Lek.lek_pk );
+-- Find all purchases that contain Aspirin.
+SELECT nakup_datum, nakup_suma FROM Nakup WHERE nakup_pk IN ( SELECT nakup_pk FROM Obsahuje NATURAL JOIN Lek WHERE lek_nazev='Aspirin' );
 
 ----------------------------------------- NOT TESTED YET -----------------------------------------
 
--- --The resulting output of this SELECT statement will include the order_id, customer_name, and product_name for all orders made between January 1, 2022, and December 31, 2022.
+-- --The resulting output of this SELECT statement will include the order_id, customer_name, and product_name for all orders made between January 1, 2022, AND December 31, 2022.
 -- SELECT 
 --     orders.order_id, 
 --     customers.customer_name, 
@@ -180,3 +178,5 @@ INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from 
 -- GROUP BY YEAR(order_date);
 
 ----------------------------------------- NOT TESTED YET -----------------------------------------
+
+--------- End of IDS_3.sql ---------
