@@ -120,8 +120,8 @@ INSERT INTO Nakup (nakup_datum, nakup_suma, lekarna_pk) VALUES (TO_DATE('17.02.2
 INSERT INTO Nakup (nakup_datum, nakup_suma, lekarna_pk) VALUES (TO_DATE('17.02.2023', 'DD.MM.YYYY'), 159.60, (SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Nejlepší lékárna')); 
 INSERT INTO Nakup (nakup_datum, nakup_suma, lekarna_pk) VALUES (TO_DATE('19.02.2023', 'DD.MM.YYYY'), 369.6, (SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Nejlepší lékárna'));
 
-INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') and nakup_suma=159.60), '020220/1234');
-INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('19.02.2023', 'DD.MM.YYYY') and nakup_suma=369.60), '981512111');
+INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=159.60), '020220/1234');
+INSERT INTO Nakup_na_predpis (nakup_pk, rodne_cislo) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('19.02.2023', 'DD.MM.YYYY') AND nakup_suma=369.60), '981512111');
 
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Vaše lékárna'), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 50);
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Vaše lékárna'), (SELECT lek_pk from Lek WHERE lek_nazev='Aspirin'), 30);
@@ -135,10 +135,10 @@ INSERT INTO Hradi (pojistovna_pk, lek_pk, castka) VALUES ((SELECT pojistovna_pk 
 INSERT INTO Hradi (pojistovna_pk, lek_pk, castka) VALUES ((SELECT pojistovna_pk from Pojistovna WHERE pojistovna_nazev='VZP'), (SELECT lek_pk from Lek WHERE lek_nazev='Xanax'), 15);
 INSERT INTO Hradi (pojistovna_pk, lek_pk, castka) VALUES ((SELECT pojistovna_pk from Pojistovna WHERE pojistovna_nazev='VZP'), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 10);
 
-INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') and nakup_suma=59.80), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 2);
-INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') and nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 1);
-INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') and nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Aspirin'), 2);
-INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') and nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Ibuprofen'), 1);
-INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('19.02.2023', 'DD.MM.YYYY') and nakup_suma=369.60), (SELECT lek_pk from Lek WHERE lek_nazev='Strepsils'), 3);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=59.80), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 2);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 1);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Aspirin'), 2);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Ibuprofen'), 1);
+INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('19.02.2023', 'DD.MM.YYYY') AND nakup_suma=369.60), (SELECT lek_pk from Lek WHERE lek_nazev='Strepsils'), 3);
 
 --------- End of IDS_2.sql ---------
