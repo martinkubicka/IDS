@@ -144,39 +144,101 @@ INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from 
 ---------  SELECTS ---------
 
 -- Find all pharmacies that store Paralen
-SELECT lekarna_nazev, lekarna_ulice, lekarna_mesto, lekarna_psc, lekarna_stat FROM Lekarna NATURAL JOIN Skladuje WHERE lek_pk=(SELECT lek_pk from Lek WHERE lek_nazev='Paralen');      
+SELECT
+    lekarna_nazev,
+    lekarna_ulice,
+    lekarna_mesto,
+    lekarna_psc,
+    lekarna_stat
+FROM
+    Lekarna NATURAL
+    JOIN Skladuje
+WHERE
+    lek_pk =(
+        SELECT
+            lek_pk
+        from
+            Lek
+        WHERE
+            lek_nazev = 'Paralen'
+    );
+
 -- Find all medicines that are covered by Česká pojišťovna
-SELECT lek_nazev FROM Lek NATURAL JOIN Hradi WHERE pojistovna_pk=(SELECT pojistovna_pk from Pojistovna WHERE pojistovna_nazev='Česká pojišťovna');
+SELECT
+    lek_nazev
+FROM
+    Lek NATURAL
+    JOIN Hradi
+WHERE
+    pojistovna_pk =(
+        SELECT
+            pojistovna_pk
+        from
+            Pojistovna
+        WHERE
+            pojistovna_nazev = 'Česká pojišťovna'
+    );
+
 -- Find all medicines that stored by any of pharmacies
-SELECT lek_nazev FROM lek WHERE EXISTS ( SELECT lekarna_pk FROM Skladuje WHERE lek_pk = Lek.lek_pk );
+SELECT
+    lek_nazev
+FROM
+    lek
+WHERE
+    EXISTS (
+        SELECT
+            lekarna_pk
+        FROM
+            Skladuje
+        WHERE
+            lek_pk = Lek.lek_pk
+    );
+
 -- Find all purchases that contain Aspirin.
-SELECT nakup_datum, nakup_suma FROM Nakup WHERE nakup_pk IN ( SELECT nakup_pk FROM Obsahuje NATURAL JOIN Lek WHERE lek_nazev='Aspirin' );
+SELECT
+    nakup_datum,
+    nakup_suma
+FROM
+    Nakup
+WHERE
+    nakup_pk IN (
+        SELECT
+            nakup_pk
+        FROM
+            Obsahuje NATURAL
+            JOIN Lek
+        WHERE
+            lek_nazev = 'Aspirin'
+    );
+    
+-- This query selects the name of a medicine, the name of the pharmacy where it is stored, and the quantity of the medicine in stock
+SELECT
+    lek_nazev,
+    lekarna_nazev,
+    mnozstvi
+FROM
+    Skladuje
+    JOIN Lek ON Skladuje.lek_pk = Lek.lek_pk
+    JOIN Lekarna ON Skladuje.lekarna_pk = Lekarna.lekarna_pk;
 
------------------------------------------ NOT TESTED YET -----------------------------------------
+-- This query selects the name of a medicine and the total quantity of the medicine in stock across all pharmacies
+SELECT
+    lek_nazev,
+    SUM(mnozstvi)
+FROM
+    Skladuje
+    JOIN Lek ON Skladuje.lek_pk = Lek.lek_pk
+GROUP BY
+    lek_nazev;
 
--- --The resulting output of this SELECT statement will include the order_id, customer_name, and product_name for all orders made between January 1, 2022, AND December 31, 2022.
--- SELECT 
---     orders.order_id, 
---     customers.customer_name, 
---     products.product_name
--- FROM orders
---     JOIN customers ON orders.customer_id = customers.customer_id
---     JOIN products ON orders.product_id = products.product_id
--- WHERE 
---     orders.order_date BETWEEN '2022-01-01' AND '2022-12-31'
-
--- --Calculation of the average number of products per order in the "orders" table
--- SELECT order_id, 
---     AVG(quantity)
--- FROM order_details
--- GROUP BY order_id;
-
--- --Calculation of total sales for each year in the "sales" table
--- SELECT YEAR(order_date) as year, 
--- SUM(total_price) as total_revenue
--- FROM sales
--- GROUP BY YEAR(order_date);
-
------------------------------------------ NOT TESTED YET -----------------------------------------
+-- This query selects the name of an insurance company and the average amount of money paid out by the company
+SELECT
+    pojistovna_nazev,
+    AVG(castka)
+FROM
+    Hradi
+    JOIN Pojistovna ON Hradi.pojistovna_pk = Pojistovna.pojistovna_pk
+GROUP BY
+    pojistovna_nazev;
 
 --------- End of IDS_3.sql ---------
