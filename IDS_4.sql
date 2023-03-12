@@ -1,4 +1,4 @@
--- @file IDS_3.sql
+-- @file IDS_4.sql
 -- @brief Implementation of second task
 -- @author { 
 --    Martin Kubička (xkubic45), 
