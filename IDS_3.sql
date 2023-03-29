@@ -41,6 +41,7 @@ CREATE TABLE Nakup (
 -- When inserting it needs nakup_pk which is primary key of parent Nakup entity
 -- Also it has special atribute rodne_cislo which needs to be in special format
 CREATE TABLE Nakup_na_predpis (
+    nakup_na_predpis_pk NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nakup_pk NUMBER NOT NULL PRIMARY KEY,
     rodne_cislo VARCHAR2(11) NOT NULL CHECK(REGEXP_LIKE(rodne_cislo, '^[0-9]{6}\/?[0-9]{3,4}$')),
     CONSTRAINT nakup_na_predpis_ck
@@ -64,6 +65,7 @@ CREATE TABLE Pojistovna (
 
 --------- Relations ---------
 CREATE TABLE Obsahuje (
+    obsahuje_pk NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nakup_pk NUMBER NOT NULL,
     lek_pk NUMBER NOT NULL,
     mnozstvi NUMBER(5) NOT NULL,
@@ -76,6 +78,7 @@ CREATE TABLE Obsahuje (
 );
 
 CREATE TABLE Skladuje (
+    skladuje_pk NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     lekarna_pk NUMBER NOT NULL,
     lek_pk NUMBER NOT NULL,
     mnozstvi NUMBER(10) NOT NULL,
@@ -88,6 +91,7 @@ CREATE TABLE Skladuje (
 );
 
 CREATE TABLE Hradi (
+    hradi_pk NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     pojistovna_pk NUMBER NOT NULL,
     lek_pk NUMBER NOT NULL,
     castka NUMBER(10, 2) NOT NULL,
