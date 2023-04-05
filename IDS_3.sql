@@ -227,7 +227,7 @@ FROM
 -- This query selects the name of a medicine and the total quantity of the medicine in stock across all pharmacies
 SELECT
     lek_nazev,
-    SUM(mnozstvi)
+    SUM(mnozstvi) AS mnozstvi_spolu
 FROM
     Skladuje
     JOIN Lek ON Skladuje.lek_pk = Lek.lek_pk
@@ -237,10 +237,10 @@ GROUP BY
 -- This query selects the name of an insurance company and the average amount of money paid out by the company
 SELECT
     pojistovna_nazev,
-    AVG(castka)
+    AVG(castka) AS prumer_hrazeni
 FROM
     Hradi
-    JOIN Pojistovna ON Hradi.pojistovna_pk = Pojistovna.pojistovna_pk
+    JOIN Pojistovna ON Hradi.pojistovna_pk = Pojistovna.pojistovna_pk 
 GROUP BY pojistovna_nazev;
 
 --------- End of IDS_3.sql ---------
