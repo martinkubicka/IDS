@@ -104,52 +104,51 @@ CREATE TABLE Hradi (
 
 --------- Triggers ---------
 
--- TODO COMMENTS
--- todo update me s novou verziou 3 sql
--- 1) nakup neobsahuje a nepresahuje mnozstvo lieku ktory nie je na sklade
-
+-- The purchase does not contain or exceed the amount of a drug that is not in stock.
 CREATE OR REPLACE TRIGGER lek_na_sklade BEFORE
-    INSERT OR UPDATE OF lek_pk, mnozstvi ON Obsahuje
+    INSERT OR UPDATE OF obsahuje_pk, mnozstvi ON Obsahuje
     FOR EACH ROW
 DECLARE
-    mnozstvi_leku NUMBER;
+    mnozstvi_leku_na_sklade NUMBER;
 BEGIN
     SELECT mnozstvi
     INTO
-        mnozstvi_leku
+        mnozstvi_leku_na_sklade
     FROM
-        Skladuje 
-        JOIN Lekarna ON Skladuje.lekarna_pk = Lekarna.lekarna_pk
+        Skladuje
     WHERE
-        lek_pk = :NEW.lek_pk;
+        lekarna_pk = (SELECT lekarna_pk FROM Nakup CROSS JOIN Lek WHERE nakup_pk = :NEW.nakup_pk AND lek_pk = :NEW.lek_pk)
+        AND lek_pk = :NEW.lek_pk;
 
-    IF (mnozstvi_leku IS NULL) THEN
-        RAISE_APPLICATION_ERROR(-20001, 'Lékárna neobsahuje daný lék.');
-    ELSIF (:NEW.mnozstvi > mnozstvi_leku) THEN
-        RAISE_APPLICATION_ERROR(-20002, 'Není dostatečné množství léku na skladě.');
+    IF (:NEW.mnozstvi > mnozstvi_leku_na_sklade) THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Není dostatečné množství léku na skladě.');
     END IF;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Lekárna neobsahuje daný lék.');
 END;
 /
     
--- 2) poistovna hradi liek ktory existuje
+-- The insurance company covers the drug that exists.
 CREATE OR REPLACE TRIGGER existuje_lek BEFORE
     INSERT OR UPDATE OF lek_pk ON Hradi
     FOR EACH ROW
 DECLARE
     existuje_lek_num NUMBER;
 BEGIN
-    SELECT COUNT(*)
+    SELECT COUNT(lek_pk)
     INTO
         existuje_lek_num
     FROM
         Lek
     WHERE
-        lek_pk =: NEW.lek_pk
-    IF existuje_lek_num = 0 THEN
+        lek_pk = :NEW.lek_pk;
+
+    IF (existuje_lek_num = 0) THEN
         RAISE_APPLICATION_ERROR(-20000, 'Pokus o hrazení léku, který neexistuje.');
     END IF;
 END;
-/
+/   
 
 --------- Example data ---------
 
@@ -179,6 +178,7 @@ INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk f
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Vaše lékárna'), (SELECT lek_pk from Lek WHERE lek_nazev='Aspirin'), 30);
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Vaše lékárna'), (SELECT lek_pk from Lek WHERE lek_nazev='Ibuprofen'), 10);
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Nejlepší lékárna'), (SELECT lek_pk from Lek WHERE lek_nazev='Strepsils'), 20);
+INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Nejlepší lékárna'), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 30);
 INSERT INTO Skladuje (lekarna_pk, lek_pk, mnozstvi) VALUES ((SELECT lekarna_pk from Lekarna WHERE lekarna_nazev='Nejlepší lékárna'), (SELECT lek_pk from Lek WHERE lek_nazev='Ibuprofen'), 100);
 
 INSERT INTO Hradi (pojistovna_pk, lek_pk, castka) VALUES ((SELECT pojistovna_pk from Pojistovna WHERE pojistovna_nazev='Česká pojišťovna'), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 15);
@@ -189,7 +189,6 @@ INSERT INTO Hradi (pojistovna_pk, lek_pk, castka) VALUES ((SELECT pojistovna_pk 
 
 INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=59.80), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 2);
 INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Paralen'), 1);
-INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Aspirin'), 2);
 INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('17.02.2023', 'DD.MM.YYYY') AND nakup_suma=159.60), (SELECT lek_pk from Lek WHERE lek_nazev='Ibuprofen'), 1);
 INSERT INTO Obsahuje (nakup_pk, lek_pk, mnozstvi) VALUES ((SELECT nakup_pk from Nakup WHERE nakup_datum=TO_DATE('19.02.2023', 'DD.MM.YYYY') AND nakup_suma=369.60), (SELECT lek_pk from Lek WHERE lek_nazev='Strepsils'), 3);
 
