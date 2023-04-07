@@ -10,6 +10,7 @@ Vaším úkolem je vývoj IS lékárny. Lékárna vydává občanům léky jak n
 
 TODO:
 -- 2x triggers + predvedenie??, 1x procedur, definicia pristupovych prav + vytvorenie pohladu - Martin 
+
 -- vytvorenie 1 indexu, 1x EXPLAIN PLAN, 1x SELECT s WITH a CASE, 1x procedura - Matej
 
 -- dokumentacia    
