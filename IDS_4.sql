@@ -153,7 +153,40 @@ END;
 
 --------- Procedures ---------
 
--- Mateji pridaj nazov procedury do sekcie Privileges (je TODO - iba zmenis meno)
+-- Mateji pridaj nazov procedury do sekcie Privileges (je tam TODO - iba zmenis meno)
+
+-- Procedure which calculates average price for medicine in the city passed as a argument.
+CREATE OR REPLACE PROCEDURE najdi_lekarny (param_mesto IN Lekarna.lekarna_mesto%TYPE) 
+IS 
+    pocet_leku NUMBER;
+    suma_spolu NUMBER;
+    
+    CURSOR cursor_lekarna IS
+        SELECT DISTINCT lek_pk, lek_cena
+        FROM Lekarna NATURAL JOIN SKLADUJE NATURAL JOIN Lek
+        WHERE lekarna_mesto = param_mesto;
+
+    row_lek cursor_lekarna%ROWTYPE;
+BEGIN
+    pocet_leku := 0;
+    suma_spolu := 0;
+
+    OPEN cursor_lekarna;
+    LOOP
+        FETCH cursor_lekarna INTO row_lek;
+        EXIT WHEN cursor_lekarna%NOTFOUND;
+        pocet_leku := pocet_leku + 1;
+        suma_spolu := suma_spolu + row_lek.lek_cena;
+    END LOOP;
+    CLOSE cursor_lekarna;
+
+    DBMS_OUTPUT.PUT_LINE('Průměrná cena za lék: ' || suma_spolu/pocet_leku);
+
+    EXCEPTION
+        WHEN ZERO_DIVIDE THEN
+            DBMS_OUTPUT.PUT_LINE('Neexistují žádné léky ve městě ' || param_mesto || '.');
+END;
+/
 
 --------- Example data ---------
 
@@ -306,8 +339,8 @@ GRANT ALL ON Obsahuje TO xmacek27;
 GRANT ALL ON Skladuje TO xmacek27;
 GRANT ALL ON Hradi TO xmacek27;
 
--- GRANT EXECUTE ON <NAME OF FIRST PROCEDURE> TO xmacek27;
--- TODO ADD HERE
+GRANT EXECUTE ON najdi_lekarny TO xmacek27;
+-- TODO ADD PROCEDURE NAME HERE
 -- GRANT EXECUTE ON  <NAME OF SECOND PROCEDURE> TO xmacek27;
 
 --------- View ---------
@@ -342,5 +375,9 @@ END;
 
 -- Print updated view
 SELECT * FROM xmacek27_view;
+
+-- Calling procedures
+SET SERVEROUTPUT ON;
+EXEC najdi_lekarny ('Brno');
 
 --------- End of IDS_4.sql ---------
