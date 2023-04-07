@@ -15,6 +15,7 @@ DROP TABLE Nakup;
 DROP TABLE Lekarna;
 DROP TABLE Lek;
 DROP TABLE Pojistovna;
+DROP MATERIALIZED VIEW xmacek27_view;
 
 --------- Entities ---------
 CREATE TABLE Lekarna (
@@ -149,6 +150,10 @@ BEGIN
     END IF;
 END;
 /   
+
+--------- Procedures ---------
+
+-- Mateji pridaj nazov procedury do sekcie Privileges (je TODO - iba zmenis meno)
 
 --------- Example data ---------
 
@@ -290,5 +295,52 @@ FROM
     Hradi
     JOIN Pojistovna ON Hradi.pojistovna_pk = Pojistovna.pojistovna_pk 
 GROUP BY pojistovna_nazev;
+
+--------- Privileges ---------
+GRANT ALL ON Lekarna TO xmacek27;
+GRANT ALL ON Nakup TO xmacek27;
+GRANT ALL ON Nakup_na_predpis TO xmacek27;
+GRANT ALL ON Lek TO xmacek27;
+GRANT ALL ON Pojistovna TO xmacek27;
+GRANT ALL ON Obsahuje TO xmacek27;
+GRANT ALL ON Skladuje TO xmacek27;
+GRANT ALL ON Hradi TO xmacek27;
+
+-- GRANT EXECUTE ON <NAME OF FIRST PROCEDURE> TO xmacek27;
+-- TODO ADD HERE
+-- GRANT EXECUTE ON  <NAME OF SECOND PROCEDURE> TO xmacek27;
+
+--------- View ---------
+CREATE MATERIALIZED VIEW xmacek27_view AS
+SELECT
+    lekarna_nazev,
+    lekarna_ulice,
+    lekarna_psc,
+    lekarna_mesto,
+    lekarna_stat
+FROM 
+    Lekarna
+WHERE
+    lekarna_mesto = 'Brno';
+
+GRANT ALL ON xmacek27_view TO xmacek27;
+
+-- Print view
+SELECT * FROM xmacek27_view;
+
+-- Update value in view
+ UPDATE Lekarna
+ SET 
+    lekarna_nazev = 'Přírodní lékárna'
+ WHERE 
+    lekarna_nazev = 'Vaše lékárna';
+
+BEGIN
+    DBMS_MVIEW.REFRESH('xmacek27_view');
+END;
+/
+
+-- Print updated view
+SELECT * FROM xmacek27_view;
 
 --------- End of IDS_4.sql ---------
