@@ -4,7 +4,7 @@
 --    Martin Kubička (xkubic45), 
 --    Matěj Macek (xmacek27) 
 -- }
--- @date 26.3.2023
+-- @date 1.5.2023
 
 --------- Reset tables ---------
 DROP TABLE Skladuje;
@@ -64,6 +64,7 @@ CREATE TABLE Pojistovna (
 
 --------- Relations ---------
 CREATE TABLE Obsahuje (
+    obsahuje_pk NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nakup_pk NUMBER NOT NULL,
     lek_pk NUMBER NOT NULL,
     mnozstvi NUMBER(5) NOT NULL,
@@ -76,6 +77,7 @@ CREATE TABLE Obsahuje (
 );
 
 CREATE TABLE Skladuje (
+    skladuje_pk NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     lekarna_pk NUMBER NOT NULL,
     lek_pk NUMBER NOT NULL,
     mnozstvi NUMBER(10) NOT NULL,
@@ -88,6 +90,7 @@ CREATE TABLE Skladuje (
 );
 
 CREATE TABLE Hradi (
+    hradi_pk NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     pojistovna_pk NUMBER NOT NULL,
     lek_pk NUMBER NOT NULL,
     castka NUMBER(10, 2) NOT NULL,
@@ -98,6 +101,55 @@ CREATE TABLE Hradi (
         FOREIGN KEY (lek_pk)
         REFERENCES Lek (lek_pk)
 );
+
+--------- Triggers ---------
+
+-- TODO COMMENTS
+-- todo update me s novou verziou 3 sql
+-- 1) nakup neobsahuje a nepresahuje mnozstvo lieku ktory nie je na sklade
+
+CREATE OR REPLACE TRIGGER lek_na_sklade BEFORE
+    INSERT OR UPDATE OF lek_pk, mnozstvi ON Obsahuje
+    FOR EACH ROW
+DECLARE
+    mnozstvi_leku NUMBER;
+BEGIN
+    SELECT mnozstvi
+    INTO
+        mnozstvi_leku
+    FROM
+        Skladuje 
+        JOIN Lekarna ON Skladuje.lekarna_pk = Lekarna.lekarna_pk
+    WHERE
+        lek_pk = :NEW.lek_pk;
+
+    IF (mnozstvi_leku IS NULL) THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Lékárna neobsahuje daný lék.');
+    ELSIF (:NEW.mnozstvi > mnozstvi_leku) THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Není dostatečné množství léku na skladě.');
+    END IF;
+END;
+/
+    
+-- 2) poistovna hradi liek ktory existuje
+CREATE OR REPLACE TRIGGER existuje_lek BEFORE
+    INSERT OR UPDATE OF lek_pk ON Hradi
+    FOR EACH ROW
+DECLARE
+    existuje_lek_num NUMBER;
+BEGIN
+    SELECT COUNT(*)
+    INTO
+        existuje_lek_num
+    FROM
+        Lek
+    WHERE
+        lek_pk =: NEW.lek_pk
+    IF existuje_lek_num = 0 THEN
+        RAISE_APPLICATION_ERROR(-20000, 'Pokus o hrazení léku, který neexistuje.');
+    END IF;
+END;
+/
 
 --------- Example data ---------
 
@@ -224,7 +276,7 @@ FROM
 -- This query selects the name of a medicine and the total quantity of the medicine in stock across all pharmacies
 SELECT
     lek_nazev,
-    SUM(mnozstvi)
+    SUM(mnozstvi) AS mnozstvi_spolu
 FROM
     Skladuje
     JOIN Lek ON Skladuje.lek_pk = Lek.lek_pk
@@ -234,11 +286,10 @@ GROUP BY
 -- This query selects the name of an insurance company and the average amount of money paid out by the company
 SELECT
     pojistovna_nazev,
-    AVG(castka)
+    AVG(castka) AS prumer_hrazeni
 FROM
     Hradi
-    JOIN Pojistovna ON Hradi.pojistovna_pk = Pojistovna.pojistovna_pk
-GROUP BY
-    pojistovna_nazev;
+    JOIN Pojistovna ON Hradi.pojistovna_pk = Pojistovna.pojistovna_pk 
+GROUP BY pojistovna_nazev;
 
---------- End of IDS_3.sql ---------
+--------- End of IDS_4.sql ---------
