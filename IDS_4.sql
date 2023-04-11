@@ -156,7 +156,7 @@ END;
 -- Mateji pridaj nazov procedury do sekcie Privileges (je tam TODO - iba zmenis meno)
 
 -- Procedure which calculates average price for medicine in the city passed as a argument.
-CREATE OR REPLACE PROCEDURE najdi_lekarny (param_mesto IN Lekarna.lekarna_mesto%TYPE) 
+CREATE OR REPLACE PROCEDURE prumerna_cena (param_mesto IN Lekarna.lekarna_mesto%TYPE) 
 IS 
     pocet_leku NUMBER;
     suma_spolu NUMBER;
@@ -339,7 +339,7 @@ GRANT ALL ON Obsahuje TO xmacek27;
 GRANT ALL ON Skladuje TO xmacek27;
 GRANT ALL ON Hradi TO xmacek27;
 
-GRANT EXECUTE ON najdi_lekarny TO xmacek27;
+GRANT EXECUTE ON prumerna_cena TO xmacek27;
 -- TODO ADD PROCEDURE NAME HERE
 -- GRANT EXECUTE ON  <NAME OF SECOND PROCEDURE> TO xmacek27;
 
@@ -378,6 +378,6 @@ SELECT * FROM xmacek27_view;
 
 -- Calling procedures
 SET SERVEROUTPUT ON;
-EXEC najdi_lekarny ('Brno');
+EXEC prumerna_cena ('Brno');
 
 --------- End of IDS_4.sql ---------
