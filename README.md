@@ -13,5 +13,9 @@ TODO:
 -- 2x triggers + predvedenie??, 1x procedur, definicia pristupovych prav + vytvorenie pohladu - Martin 
 
 -- vytvorenie 1 indexu, 1x EXPLAIN PLAN, 1x SELECT s WITH a CASE, 1x procedura - Matej
+    -- procedura            DONE 
+    -- index                DONE
+    -- EXPLAIN PLAN         DONE but not sure of the result? we should together with martin look at it becouse of defense
+    - SELECT WITH a CASE    DONE
 
 -- dokumentacia    
