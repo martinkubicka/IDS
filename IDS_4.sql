@@ -375,6 +375,29 @@ FROM
     JOIN Pojistovna ON Hradi.pojistovna_pk = Pojistovna.pojistovna_pk 
 GROUP BY pojistovna_nazev;
 
+-- SELECT WITH 
+-- The query obtains the number of drugs that have been purchased, divided into two categories - "prescription" and "non-prescription".
+WITH 
+    predpis AS (
+        SELECT COUNT(nakup_pk) AS pocet_predpisu
+        FROM Nakup_na_predpis
+    ),
+    bez_predpisu AS (
+        SELECT COUNT(nakup_pk) AS pocet_bez_predpisu
+        FROM Nakup
+        WHERE nakup_pk NOT IN (SELECT nakup_pk FROM Nakup_na_predpis)
+    )
+SELECT 
+    pocet_predpisu, 
+    pocet_bez_predpisu,
+    CASE
+        WHEN pocet_predpisu IS NULL THEN pocet_bez_predpisu
+        WHEN pocet_bez_predpisu IS NULL THEN pocet_predpisu
+        ELSE 0
+    END AS chybejici_data
+FROM 
+    predpis, bez_predpisu;
+
 --------- Privileges ---------
 GRANT ALL ON Lekarna TO xmacek27;
 GRANT ALL ON Nakup TO xmacek27;
@@ -385,19 +408,7 @@ GRANT ALL ON Obsahuje TO xmacek27;
 GRANT ALL ON Skladuje TO xmacek27;
 GRANT ALL ON Hradi TO xmacek27;
 
--- todo is it neccesary ?
--- GRANT ALL ON Lekarna_seq TO xkubic45;
--- GRANT ALL ON Nakup TO xkubic45;
--- GRANT ALL ON Nakup_na_predpis TO xkubic45;
--- GRANT ALL ON Lek TO xkubic45;
--- GRANT ALL ON Pojistovna TO xkubic45;
--- GRANT ALL ON Obsahuje TO xkubic45;
--- GRANT ALL ON Skladuje TO xkubic45;
--- GRANT ALL ON Hradi TO xkubic45;
-
 GRANT EXECUTE ON prumerna_cena TO xmacek27;
--- TODO ADD PROCEDURE NAME HERE
--- GRANT EXECUTE ON  <NAME OF SECOND PROCEDURE> TO xmacek27;
 GRANT EXECUTE ON zobrazit_nakup TO xmacek27;
 
 --------- View ---------
@@ -439,72 +450,42 @@ EXEC prumerna_cena ('Brno');
 EXEC zobrazit_nakup(1);
 
 --------- EXPLAIN PLAN ---------
--- DROP index
--- DROP INDEX index_;
-
--- ALTER TABLE lek
--- ADD CONSTRAINT lek_pk PRIMARY KEY (lek_kod);VYPISNAKUPYLEKARNY
 
 -- EXPLAIN PLAN without index
 EXPLAIN PLAN FOR 
-SELECT 
-    lek_nazev,
-    lek_cena,
-    SUM(nakup_suma) AS prodanych_suma
+SELECT
+    lekarna_nazev,
+    SUM(nakup_suma) AS suma
 FROM
-    Lek
-    NATURAL JOIN Nakup
-GROUP BY 
-    lek_nazev, 
-    lek_cena
-HAVING 
-    SUM(nakup_suma) > 2;
+    Lekarna NATURAL
+    JOIN Nakup
+GROUP BY
+    lekarna_nazev
+HAVING
+    SUM(nakup_suma) > 100;
 
 -- this will show the plan
 SELECT * FROM TABLE(dbms_xplan.display); 
     
 -- creating index 
-CREATE INDEX index_ ON lek (lek_nazev, lek_cena);
+CREATE UNIQUE INDEX ind ON Lekarna(lekarna_nazev);
 
 -- EXPLAIN PLAN with index
 EXPLAIN PLAN FOR
 SELECT
-    lek_nazev,
-    lek_cena,
-    SUM(nakup_suma) AS prodanych_suma
+    lekarna_nazev,
+    SUM(nakup_suma) AS suma
 FROM
-    Lek
-    NATURAL JOIN Nakup
-GROUP BY 
-    lek_nazev, 
-    lek_cena
+    Lekarna NATURAL
+    JOIN Nakup
+GROUP BY
+    lekarna_nazev
 HAVING
-    SUM(nakup_suma) > 2;
+    SUM(nakup_suma) > 100;
 
 -- this will show the plan
 SELECT * FROM TABLE(dbms_xplan.display);
 
-------- SELECT WITH ----------------
+DROP INDEX ind;
 
--- The query obtains the number of drugs that have been purchased, divided into two categories - "prescription" and "non-prescription".
-WITH 
-    predpis AS (
-        SELECT COUNT(nakup_pk) AS pocet_predpisu
-        FROM Nakup_na_predpis
-    ),
-    bez_predpisu AS (
-        SELECT COUNT(nakup_pk) AS pocet_bez_predpisu
-        FROM Nakup
-        WHERE nakup_pk NOT IN (SELECT nakup_pk FROM Nakup_na_predpis)
-    )
-SELECT 
-    pocet_predpisu, 
-    pocet_bez_predpisu,
-    CASE
-        WHEN pocet_predpisu IS NULL THEN pocet_bez_predpisu
-        WHEN pocet_bez_predpisu IS NULL THEN pocet_predpisu
-        ELSE 0
-    END AS chybejici_data
-FROM 
-    predpis, bez_predpisu;
 --------- End of IDS_4.sql ---------
