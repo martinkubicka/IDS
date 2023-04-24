@@ -375,29 +375,44 @@ FROM
     JOIN Pojistovna ON Hradi.pojistovna_pk = Pojistovna.pojistovna_pk 
 GROUP BY pojistovna_nazev;
 
--- SELECT WITH 
--- The query obtains the number of drugs that have been purchased, divided into two categories - "prescription" and "non-prescription".
-WITH 
-    predpis AS (
-        SELECT COUNT(nakup_pk) AS pocet_predpisu
-        FROM Nakup_na_predpis
-    ),
-    bez_predpisu AS (
-        SELECT COUNT(nakup_pk) AS pocet_bez_predpisu
-        FROM Nakup
-        WHERE nakup_pk NOT IN (SELECT nakup_pk FROM Nakup_na_predpis)
-    )
-SELECT 
-    pocet_predpisu, 
-    pocet_bez_predpisu,
+-- SELECT WITH
+-- Overall, this query returns a list of drugs, along with their number of purchases, 
+-- total sales, price, and prescription Yes/No, for all drugs that are stocked at any pharmacy in our database.
+WITH PocetNakupu AS (
+    SELECT
+        lek_pk,
+        COUNT(*) AS pocet_nakupu
+    FROM
+        Obsahuje
+    GROUP BY
+        lek_pk
+),
+CastkaZaLek AS (
+    SELECT
+        lek_pk,
+        SUM(castka) AS celkova_castka
+    FROM
+        Hradi
+    GROUP BY
+        lek_pk
+)
+SELECT
+    Lek.lek_pk,
+    Lek.lek_nazev,
+    Lek.lek_cena,
     CASE
-        WHEN pocet_predpisu IS NULL THEN pocet_bez_predpisu
-        WHEN pocet_bez_predpisu IS NULL THEN pocet_predpisu
-        ELSE 0
-    END AS chybejici_data
-FROM 
-    predpis, bez_predpisu;
-
+        WHEN Lek.lek_na_predpis = 1 THEN 'Ano'
+        ELSE 'Ne'
+    END AS PREDPIS,
+    PocetNakupu.pocet_nakupu,
+    CastkaZaLek.celkova_castka
+FROM
+    Lek
+    LEFT JOIN PocetNakupu ON Lek.lek_pk = PocetNakupu.lek_pk
+    LEFT JOIN Skladuje ON Lek.lek_pk = Skladuje.lek_pk
+    LEFT JOIN Lekarna ON Skladuje.lekarna_pk = Lekarna.lekarna_pk
+    LEFT JOIN CastkaZaLek ON Lek.lek_pk = CastkaZaLek.lek_pk;
+    
 --------- Privileges ---------
 GRANT ALL ON Lekarna TO xmacek27;
 GRANT ALL ON Nakup TO xmacek27;
